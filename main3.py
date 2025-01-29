@@ -18,111 +18,111 @@ class Formulario(QWidget):
         super().__init__()
 
         self.setWindowTitle("CEFET-MG - Atividades Complementares")
-        self.setFixedSize(700, 500)
+        self.resize(100, 200)
         self.setWindowIcon(QIcon("cefetmg.ico"))
 
         # Arquivo JSON para armazenar os dados
-        self.json_file = "dados_atividades.json"
-        self.dados = self.carregar_dados_json()
+        self.arquivo_json = "dados_atividades.json"
+        self.dados_atividades = self.carregar_arquivo_json()
 
         # Cria a barra de menu
-        menu_bar = QMenuBar(self)
-        ajuda_menu = QMenu("Ajuda", self)
+        self.barra_menu = QMenuBar(self)
+        self.menu_ajuda = QMenu("Ajuda", self)
 
-        sobre_action = QAction("Sobre", self)
-        sobre_action.triggered.connect(self.mostrar_sobre)
-        ajuda_menu.addAction(sobre_action)
-        menu_bar.addMenu(ajuda_menu)
+        self.acao_sobre = QAction("Sobre", self)
+        self.acao_sobre.triggered.connect(self.exibir_sobre)
+        self.menu_ajuda.addAction(self.acao_sobre)
+        self.barra_menu.addMenu(self.menu_ajuda)
 
         # Adiciona o layout principal
-        layout_principal = QVBoxLayout()
-        layout_principal.setMenuBar(menu_bar)
+        self.layout_principal = QVBoxLayout()
+        self.layout_principal.setMenuBar(self.barra_menu)
 
         # Espaçador para empurrar o menu para a direita
-        menu_bar.setLayoutDirection(Qt.RightToLeft)
+        self.barra_menu.setLayoutDirection(Qt.RightToLeft)
 
-        # Fonte personalizada
-        fonte = QFont("Segoe UI", 9)
-        self.setStyleSheet("""
-            QWidget {
-                background-color: #f7f7f7;
-                font-family: "Segoe UI", sans-serif;
-                font-size: 9pt;
-            }
-            QLabel {
+        # Fonte e estilo personalizados
+        fonte = QFont("Helvetica Neue", 10)
+        self.setStyleSheet(f"""
+            QWidget {{
+                background-color: #ECECEC; 
+                font-family: "Helvetica Neue", sans-serif;
+                font-size: 10pt;
+            }}
+            QLabel {{
                 font-weight: bold;
-                color: #333;
-            }
-            QLineEdit, QComboBox {
-                border: 1px solid #ccc;
-                border-radius: 5px;
-                padding: 8px;
+                color: #444;
+            }}
+            QLineEdit, QComboBox {{
+                border: 1px solid #BEBEBE;
+                border-radius: 4px;
+                padding: 6px;
                 background-color: white;
                 margin-bottom: 10px;
-            }
-            QPushButton {
-                background-color: #5a99d4;
+            }}
+            QPushButton {{
+                background-color: #007AFF;
                 color: white;
                 border: none;
-                border-radius: 5px;
-                padding: 8px;
+                border-radius: 4px;
+                padding: 6px 12px;
                 font-size: 10pt;
-            }
-            QPushButton:hover {
-                background-color: #4a7db5;
-            }
-            QPushButton:pressed {
-                background-color: #3a5e8a;
-            }
-            QTextEdit {
-                border: 1px solid #ccc;
-                border-radius: 5px;
+            }}
+            QPushButton:hover {{
+                background-color: #005EB8;
+            }}
+            QPushButton:pressed {{
+                background-color: #004A91;
+            }}
+            QTextEdit {{
+                border: 1px solid #BEBEBE;
+                border-radius: 4px;
                 padding: 8px;
                 background-color: white;
-                font-size: 9pt;
+                font-size: 10pt;
                 margin-top: 10px;
-            }
-            QMenuBar {
+            }}
+            QMenuBar {{
                 background-color: #F0F0F5;
                 color: #333;
-            }
-            QMenuBar::item {
+            }}
+            QMenuBar::item {{
                 background: transparent;
                 padding: 5px 10px;
-            }
-            QMenuBar::item:selected {
+            }}
+            QMenuBar::item:selected {{
                 background: #007AFF;
                 color: white;
-            }
-            QMenu {
+            }}
+            QMenu {{
                 background-color: #FFFFFF;
                 border: 1px solid #C8C8C8;
-            }
-            QMenu::item {
+            }}
+            QMenu::item {{
                 padding: 5px 20px;
                 background: transparent;
                 color: #333;
-            }
-            QMenu::item:selected {
+            }}
+            QMenu::item:selected {{
                 background: #007AFF;
                 color: white;
-            }
+            }}
         """)
 
         # Layout horizontal principal com QSplitter
-        splitter = QSplitter(Qt.Horizontal)
+        self.divisor = QSplitter(Qt.Horizontal)
 
         # Layout vertical para os itens do formulário
-        layout_formulario = QVBoxLayout()
+        self.layout_formulario = QVBoxLayout()
 
         # Campo Matrícula
-        self.label_matricula = QLabel("Matrícula:")
-        self.input_matricula = QLineEdit()
-        layout_formulario.addWidget(self.label_matricula)
-        layout_formulario.addWidget(self.input_matricula)
+        self.rotulo_matricula = QLabel("Matrícula:")
+        self.campo_matricula = QLineEdit()
+        self.layout_formulario.addWidget(self.rotulo_matricula)
+        self.layout_formulario.addWidget(self.campo_matricula)
 
         # Lista de atividades
-        self.atividades = ["Todos"] + [
+        self.lista_atividades = ["Todos"] + [
             "01. Produção Científica e Tecnológica",
             "02. Apresentação de Trabalhos em Eventos",
             "03. Participação em congresso e encontro científico",
@@ -147,105 +147,113 @@ class Formulario(QWidget):
         ]
 
         # ComboBox para selecionar a atividade
-        self.label_atividade = QLabel("Selecione a Atividade:")
-        self.combo_atividade = QComboBox()
-        self.combo_atividade.addItems(self.atividades)
-        self.combo_atividade.currentIndexChanged.connect(self.carregar_dados_filtrados)
-        layout_formulario.addWidget(self.label_atividade)
-        layout_formulario.addWidget(self.combo_atividade)
+        self.rotulo_atividade = QLabel("Selecione a Atividade:")
+        self.caixa_atividade = QComboBox()
+        self.caixa_atividade.addItems(self.lista_atividades)
+        self.caixa_atividade.currentIndexChanged.connect(self.carregar_dados_filtrados)
+        self.layout_formulario.addWidget(self.rotulo_atividade)
+        self.layout_formulario.addWidget(self.caixa_atividade)
 
         # Campo Horas Pleiteadas
-        self.label_horas = QLabel("Horas Pleiteadas:")
-        self.input_horas = QLineEdit()
-        layout_formulario.addWidget(self.label_horas)
-        layout_formulario.addWidget(self.input_horas)
+        self.rotulo_horas = QLabel("Horas Pleiteadas:")
+        self.campo_horas = QLineEdit()
+        self.layout_formulario.addWidget(self.rotulo_horas)
+        self.layout_formulario.addWidget(self.campo_horas)
 
         # Botão para selecionar arquivo PDF
         self.botao_selecionar_pdf = QPushButton("Selecionar PDF")
         self.botao_selecionar_pdf.clicked.connect(self.selecionar_pdf)
-        layout_formulario.addWidget(self.botao_selecionar_pdf)
+        self.layout_formulario.addWidget(self.botao_selecionar_pdf)
 
         # Campo para exibir o caminho do PDF
-        self.label_caminho_pdf = QLabel("Caminho do PDF:")
-        self.texto_caminho_pdf = QLineEdit()
-        self.texto_caminho_pdf.setReadOnly(True)
-        layout_formulario.addWidget(self.label_caminho_pdf)
-        layout_formulario.addWidget(self.texto_caminho_pdf)
+        self.rotulo_caminho_pdf = QLabel("Caminho do PDF:")
+        self.campo_caminho_pdf = QLineEdit()
+        self.campo_caminho_pdf.setReadOnly(True)
+        self.layout_formulario.addWidget(self.rotulo_caminho_pdf)
+        self.layout_formulario.addWidget(self.campo_caminho_pdf)
 
         # Botão de Calcular
         self.botao_calcular = QPushButton("Calcular")
         self.botao_calcular.clicked.connect(self.calcular_resultado)
-        layout_formulario.addWidget(self.botao_calcular)
+        self.layout_formulario.addWidget(self.botao_calcular)
 
         # Botão de Gerar Relatório
         self.botao_relatorio = QPushButton("Gerar Relatório")
         self.botao_relatorio.clicked.connect(self.gerar_relatorio)
-        layout_formulario.addWidget(self.botao_relatorio)
+        self.layout_formulario.addWidget(self.botao_relatorio)
 
         # Widget para o layout do formulário
-        widget_formulario = QWidget()
-        widget_formulario.setLayout(layout_formulario)
+        self.widget_formulario = QWidget()
+        self.widget_formulario.setLayout(self.layout_formulario)
 
-        # Adiciona o widget do formulário ao splitter
-        splitter.addWidget(widget_formulario)
+        # Adiciona o widget do formulário ao splitter (divisor)
+        self.divisor.addWidget(self.widget_formulario)
 
-        # Caixa de texto para exibir o resultado
+        # Caixa de texto para exibir o resultado (maior no splitter)
         self.resultado_texto = QTextEdit()
         self.resultado_texto.setReadOnly(True)
 
         # Adiciona a caixa de texto ao splitter
-        splitter.addWidget(self.resultado_texto)
+        self.divisor.addWidget(self.resultado_texto)
 
-        # Define as proporções do splitter
-        splitter.setStretchFactor(0, 1)
-        splitter.setStretchFactor(1, 2)
+        # Ajuste para deixar o TextEdit maior que o formulário
+        self.divisor.setStretchFactor(0, 1)
+        self.divisor.setStretchFactor(1, 3)  # Aumenta o fator de crescimento do texto
+
+        self.divisor.setSizes([100, 500])  # <-- ALTERAÇÃO AQUI
 
         # Adiciona o splitter ao layout principal
-        layout_principal.addWidget(splitter)
+        self.layout_principal.addWidget(self.divisor)
 
         # Configurar layout principal
-        self.setLayout(layout_principal)
+        self.setLayout(self.layout_principal)
 
-    def mostrar_sobre(self):
+    # =================== Métodos Renomeados para Português ===================
+
+    def exibir_sobre(self):
+        """Exibe a janela 'Sobre'."""
         alerta = Sobre(self)
         alerta.exec()  # Exibe como diálogo modal
 
-    def carregar_dados_json(self):
+    def carregar_arquivo_json(self):
         """Carrega os dados do arquivo JSON."""
-        if os.path.exists(self.json_file):
-            with open(self.json_file, "r") as file:
+        if os.path.exists(self.arquivo_json):
+            with open(self.arquivo_json, "r") as file:
                 return json.load(file)
         return {}
 
-    def salvar_dados_json(self):
+    def salvar_arquivo_json(self):
         """Salva os dados no arquivo JSON."""
-        with open(self.json_file, "w") as file:
-            json.dump(self.dados, file, indent=4)
+        with open(self.arquivo_json, "w") as file:
+            json.dump(self.dados_atividades, file, indent=4)
+
+    # =================== Métodos da Lógica ===================
 
     def carregar_dados_filtrados(self):
         """Carrega os dados filtrados com base na atividade selecionada."""
-        atividade = self.combo_atividade.currentText()
-        if atividade == "Todos":
-            texto = ""
-            for atividade, itens in self.dados.items():
-                texto += f"{atividade}:\n"
+        atividade_selecionada = self.caixa_atividade.currentText()
+
+        if atividade_selecionada == "Todos":
+            texto_exibicao = ""
+            for atividade, itens in self.dados_atividades.items():
+                texto_exibicao += f"{atividade}:\n"
                 for item in itens:
-                    texto += f"  Matrícula: {item['matricula']}\n"
-                    texto += f"  Horas Pleiteadas: {item['horas']}\n"
-                    texto += f"  PDF: {item['pdf']}\n"
-                    texto += f"  Horas Aprovadas: {item['horas_aprovadas']:.2f}\n"
-                    texto += f"  Data Inclusão: {item['data_inclusao']}\n\n"
-            self.resultado_texto.setPlainText(texto)
-        elif atividade in self.dados:
-            resultados = self.dados[atividade]
-            texto = ""
+                    texto_exibicao += f"  Matrícula: {item['matricula']}\n"
+                    texto_exibicao += f"  Horas Pleiteadas: {item['horas']}\n"
+                    texto_exibicao += f"  PDF: {item['pdf']}\n"
+                    texto_exibicao += f"  Horas Aprovadas: {item['horas_aprovadas']:.2f}\n"
+                    texto_exibicao += f"  Data Inclusão: {item['data_inclusao']}\n\n"
+            self.resultado_texto.setPlainText(texto_exibicao)
+        elif atividade_selecionada in self.dados_atividades:
+            resultados = self.dados_atividades[atividade_selecionada]
+            texto_exibicao = ""
             for item in resultados:
-                texto += f"Matrícula: {item['matricula']}\n"
-                texto += f"Horas Pleiteadas: {item['horas']}\n"
-                texto += f"PDF: {item['pdf']}\n"
-                texto += f"Horas Aprovadas: {item['horas_aprovadas']:.2f}\n"
-                texto += f"Data Inclusão: {item['data_inclusao']}\n\n"
-            self.resultado_texto.setPlainText(texto)
+                texto_exibicao += f"Matrícula: {item['matricula']}\n"
+                texto_exibicao += f"Horas Pleiteadas: {item['horas']}\n"
+                texto_exibicao += f"PDF: {item['pdf']}\n"
+                texto_exibicao += f"Horas Aprovadas: {item['horas_aprovadas']:.2f}\n"
+                texto_exibicao += f"Data Inclusão: {item['data_inclusao']}\n\n"
+            self.resultado_texto.setPlainText(texto_exibicao)
         else:
             self.resultado_texto.clear()
 
@@ -253,25 +261,25 @@ class Formulario(QWidget):
         """Abre um diálogo para selecionar o arquivo PDF."""
         caminho_pdf, _ = QFileDialog.getOpenFileName(self, "Selecionar PDF", "", "Arquivos PDF (*.pdf)")
         if caminho_pdf:
-            self.texto_caminho_pdf.setText(caminho_pdf)
+            self.campo_caminho_pdf.setText(caminho_pdf)
 
     def calcular_resultado(self):
         """Calcula 30% das horas pleiteadas e salva no JSON."""
-        matricula = self.input_matricula.text()
-        atividade = self.combo_atividade.currentText()
-        horas = self.input_horas.text()
-        caminho_pdf = self.texto_caminho_pdf.text()
+        matricula = self.campo_matricula.text()
+        atividade = self.caixa_atividade.currentText()
+        horas_digitadas = self.campo_horas.text()
+        caminho_pdf = self.campo_caminho_pdf.text()
 
         if atividade == "Todos":
             self.mostrar_mensagem("Erro", "Selecione uma atividade específica para calcular.")
             return
 
-        if not matricula or not horas or not caminho_pdf:
+        if not matricula or not horas_digitadas or not caminho_pdf:
             self.mostrar_mensagem("Erro", "Todos os campos (Matrícula, Horas Pleiteadas e PDF) são obrigatórios.")
             return
 
         try:
-            horas_pleiteadas = float(horas)
+            horas_pleiteadas = float(horas_digitadas)
             horas_aprovadas = horas_pleiteadas * 0.30
         except ValueError:
             self.mostrar_mensagem("Erro", "Insira um número válido em 'Horas Pleiteadas'.")
@@ -285,29 +293,33 @@ class Formulario(QWidget):
             "data_inclusao": datetime.now().strftime("%Y-%m-%d %H:%M:%S"),
         }
 
-        if atividade not in self.dados:
-            self.dados[atividade] = []
-        self.dados[atividade].append(item)
+        if atividade not in self.dados_atividades:
+            self.dados_atividades[atividade] = []
+        self.dados_atividades[atividade].append(item)
 
-        self.salvar_dados_json()
+        self.salvar_arquivo_json()
         self.carregar_dados_filtrados()
         self.limpar_campos()
 
     def limpar_campos(self):
         """Limpa os campos de entrada."""
-        self.input_horas.clear()
-        self.texto_caminho_pdf.clear()
+        self.campo_horas.clear()
+        self.campo_caminho_pdf.clear()
 
     def mostrar_mensagem(self, titulo, mensagem):
         """Exibe uma mensagem informativa."""
         QMessageBox.information(self, titulo, mensagem)
 
+    # =================== Relatórios ===================
 
     def gerar_relatorio_(self):
-        """Gera um relatório em PDF com os dados do JSON e imagens convertidas dos PDFs."""
+        """
+        Gera um relatório em PDF com os dados do JSON e
+        imagens convertidas dos PDFs (função alternativa).
+        """
         try:
             # Caminho do Poppler para a conversão
-            poppler_path = r"C:\Poppler\Library\bin"  # Certifique-se de que o caminho está correto no seu sistema
+            poppler_path = r"C:\Poppler\Library\bin"  # Ajuste de acordo com seu ambiente
 
             # Inicializa o PDF
             pdf = FPDF()
@@ -317,9 +329,9 @@ class Formulario(QWidget):
 
             # Abre os dados do JSON
             with open("dados_atividades.json", "r") as file:
-                dados = json.load(file)
+                dados_temp = json.load(file)
 
-            for atividade, itens in dados.items():
+            for atividade, itens in dados_temp.items():
                 pdf.set_font("Arial", style="B", size=14)
                 pdf.cell(0, 10, f"Atividade: {atividade}", ln=True, align="L")
 
@@ -331,7 +343,7 @@ class Formulario(QWidget):
                     pdf.cell(0, 10, f"Data Inclusão: {item['data_inclusao']}", ln=True)
 
                     # Caminho do PDF associado
-                    pdf_path = os.path.normpath(item['pdf'])  # Garante o formato correto do caminho
+                    pdf_path = os.path.normpath(item['pdf'])
                     if os.path.exists(pdf_path):
                         try:
                             # Converte o PDF em imagens
@@ -348,7 +360,7 @@ class Formulario(QWidget):
                     else:
                         pdf.cell(0, 10, f"Arquivo PDF não encontrado: {pdf_path}", ln=True)
 
-                    pdf.ln(10)  # Adiciona espaço entre os registros
+                    pdf.ln(10)  # Espaço entre registros
 
             # Salva o relatório
             pdf.output("relatorio_atividades.pdf")
@@ -367,9 +379,9 @@ class Formulario(QWidget):
             pdf.set_font("Arial", size=12)
 
             with open("dados_atividades.json", "r") as file:
-                dados = json.load(file)
+                dados_temp = json.load(file)
 
-            for atividade, itens in dados.items():
+            for atividade, itens in dados_temp.items():
                 pdf.set_font("Arial", style="B", size=14)
                 pdf.cell(0, 10, f"Atividade: {atividade}", ln=True, align="L")
                 for item in itens:
@@ -386,7 +398,7 @@ class Formulario(QWidget):
             merger = PdfMerger()
             merger.append(relatorio_path)
 
-            for atividade, itens in dados.items():
+            for atividade, itens in dados_temp.items():
                 for item in itens:
                     pdf_path = os.path.normpath(item["pdf"])
                     if os.path.exists(pdf_path):
@@ -400,10 +412,10 @@ class Formulario(QWidget):
         except Exception as e:
             QMessageBox.critical(self, "Erro", f"Erro ao gerar relatório: {e}")
 
-            
     def obter_data_hora_atual(self):
         from datetime import datetime
         return datetime.now().strftime("%d/%m/%Y %H:%M:%S")
+
 
 class Sobre(QDialog):
     """Classe para a janela 'Sobre'."""
@@ -419,14 +431,6 @@ class Sobre(QDialog):
         layout.addWidget(info_label)
         
         # Caixa de texto somente leitura para instruções
-        instrucoes = """
-Cota Zero
-(Carlos Drummond de Andrade)
-
-Stop.
-A vida parou
-ou foi o automóvel?
-        """.strip()
         instrucoes = """
 Quadrilha
 (Carlos Drummond de Andrade)
@@ -447,6 +451,7 @@ que não tinha entrado na história.
         layout.addWidget(instrucoes_textbox)
         
         self.setLayout(layout)
+
 
 if __name__ == "__main__":
     app = QApplication(sys.argv)
